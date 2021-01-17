@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>使用css3实现轮播效果</title>
+    <script src = 'https://cdn.staticfile.org/vue/2.2.2/vue.min.js'></script>
+    <style>
+        body:after{
+            content: '';
+            width: 100%;
+            height:100%;
+            top: 0;
+            left: 0;
+            opacity: 0.3;
+            z-index: -1;
+            background-image: url('./src/background.jpg');
+            background-repeat: no-repeat;
+            background-size: 100% 100%;
+            position:absolute;
+        }
+        #carouselMap{
+            width: 1000px;
+            height: 600px;
+            overflow: hidden;
+            margin: 30px auto;
+            position: relative;       
+        }
+        #carouselMap>img{
+            position: absolute;
+            top: 10px;
+            left: 100px;
+            width: 700px;
+            height: 500px;
+            opacity: 0;
+            display: block;
+            border-radius: 10px;
+            box-shadow: 3px 3px 3px rgb(125, 107, 139);
+            transition: all 2s;
+        }
+        nav{
+            position: absolute;
+            width: 700px;
+            left:100px;
+            bottom: 0px;
+            display: flex;
+            justify-content:space-between;
+            overflow: hidden;
+        }
+        nav>img{
+            border-radius: 5px;
+            width: 60px;
+            flex:1;
+            opacity: 0.7;
+        }
+        nav>img:hover{
+            opacity: 1;
+            transition: all 1s;
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body>
+    <div id = "carouselMap">
+        <img v-for="(image,index) in nameList" 
+        :key="index" 
+        :src="basicPath+image" 
+        :alt="index">
+        <nav @click="myanimation()">
+            <img v-for="(image,index) in nameList"
+            :key="index" 
+            :src="basicPath+image" 
+            :alt="index">
+        </nav>
+    </div>   
+</body>
+<script>
+    var data = {
+            basicPath: 'http://localhost:1010/src/images/',
+            nameList: [],
+            imageList: [],
+            totalNum: 0,
+            topNum: 0,
+        };
+    var app = new Vue({
+            el:"#carouselMap",
+            data: data,
+            updated: function(){
+                this.imageList = document.querySelectorAll('#carouselMap>img');
+                this.doSelction();
+                this.autoChange();
+            },
+            mounted:function(){
+                var requestImages = new XMLHttpRequest();
+                requestImages.open('get','http://localhost:1000/getImageList',true);
+                requestImages.onreadystatechange = function(){
+                    if(requestImages.readyState==4){
+                        if(requestImages.status==200||requestImages.status==0){
+                                app.nameList = JSON.parse(requestImages.responseText)['nameList'];
+                                app.totalNum = app.nameList.length;
+                        }
+                    }
+                }
+                requestImages.send(null);
+            },
+            methods:{
+                myanimation: function (ev){
+                    var ev = ev || window.event;
+                    var target = ev.target;
+                    if(target.nodeName.toLowerCase() =='img'){
+                        this.topNum = Number(target.alt);
+                    }
+                    this.doSelction();
+                },
+                doSelction:function(){
+                    for(let item of this.imageList){
+                        if(item.alt==this.topNum)
+                        {
+                            item.style.opacity="1";
+                        }
+                        else{
+                            item.style.opacity="0";
+                        }
+                    }  
+                },
+                autoChange(){
+                    setInterval(()=>{
+                        app.topNum = (app.topNum+1)%app.totalNum;
+                        app.doSelction();
+                    },3000);
+                }
+            },
+        });
+   
+    
+    // 初始化
+    
+    
+    
+    
+    
+    //切换样式选择
+    
+    
+</script>
+</html>

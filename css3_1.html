@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>使用css3实现轮播效果</title>
+    <!-- 这里实现的图片轮播都是写死的 -->
+    <style>
+        #carouselMap{
+            width: 1000px;
+            height: 600px;
+            overflow: hidden;
+            margin: 30px auto;
+            position: relative;       
+        }
+        #carouselMap>img{
+            position: absolute;
+            top: 10px;
+            left: 100px;
+            width: 600px;
+            height: 400px;
+            opacity: 0;
+            display: block;
+            border-radius: 10px;
+            box-shadow: 3px 3px 3px rgb(125, 107, 139);
+            transition: all 2s;
+        }
+        nav{
+            position: absolute;
+            width: 600px;
+            left:100px;
+            bottom: 0px;
+            display: flex;
+            justify-content:space-between;
+        }
+        nav>img{
+            border-radius: 5px;
+            width: 60px;
+            flex:1;
+            opacity: 0.7;
+        }
+        nav>img:hover{
+            opacity: 1;
+            transition: all 1s;
+        }
+    </style>
+</head>
+<body>
+    <div id = "carouselMap">
+        <img src="./src/images/1.png" alt="0">
+        <img src="./src/images/2.png" alt="1">
+        <img src="./src/images/3.png" alt="2">
+        <img src="./src/images/4.png" alt="3">
+        <nav onclick="myanimation()">
+            <img src="./src/images/1.png" alt="0">
+            <img src="./src/images/2.png" alt="1">
+            <img src="./src/images/3.png" alt="2">
+            <img src="./src/images/4.png" alt="3">
+        </nav>
+    </div>   
+</body>
+<script>
+    // 初始化
+    var imageList = document.querySelectorAll("#carouselMap>img");
+    var totalNum = 4;
+    var topNum = 0;
+    function doSelction(){
+        for(let item of imageList){
+            if(item.alt==topNum)
+            {
+                item.style.opacity="1";
+            }
+            else{
+                item.style.opacity="0";
+            }
+        }  
+    }
+    window.onload = function(){
+        doSelction();
+    };
+    
+//注册点击事件
+    var myanimation = function(ev){
+        var ev = ev || window.event;
+        var target = ev.target;
+        if(target.nodeName.toLowerCase() =='img'){
+            topNum = Number(target.alt);
+        }
+        doSelction();
+    }
+// 编写轮播事件  
+    setInterval(()=>{
+        topNum = (topNum+1)%totalNum;
+        doSelction();
+    },3000);
+</script>
+</html>

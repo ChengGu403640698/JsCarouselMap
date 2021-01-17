@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>使用css3实现轮播效果</title>
+    <!-- 这里实现的图片轮播都是写死的 -->
+    <style>
+        #carouselMap{
+            width: 1000px;
+            height: 600px;
+            overflow: hidden;
+            margin: 30px auto;
+            position: relative;       
+        }
+        #carouselMap>img{
+            position: absolute;
+            top: 10px;
+            left: 100px;
+            width: 600px;
+            height: 400px;
+            opacity: 0;
+            display: block;
+            border-radius: 10px;
+            box-shadow: 3px 3px 3px rgb(125, 107, 139);
+            transition: all 2s;
+        }
+        nav{
+            position: absolute;
+            width: 600px;
+            left:100px;
+            bottom: 0px;
+            display: flex;
+            justify-content:space-between;
+        }
+        nav>img{
+            border-radius: 5px;
+            width: 60px;
+            flex:1;
+            opacity: 0.7;
+        }
+        nav>img:hover{
+            opacity: 1;
+            transition: all 1s;
+        }
+    </style>
+</head>
+<body>
+    <div id = "carouselMap">
+        <nav onclick="myanimation()">
+        </nav>
+    </div>   
+</body>
+<script>
+    // 初始化
+    var carouselMap = document.querySelector('#carouselMap');
+    var thumbImages = document.querySelector('nav');
+    var basicPath = './src/images/'
+    var nameList = [];
+    var imageList = [];
+    var totalNum = 0;
+    var topNum = 0;
+    var requestImages = new XMLHttpRequest();
+    
+    //注册点击事件
+    function myanimation(ev){
+        var ev = ev || window.event;
+        var target = ev.target;
+        if(target.nodeName.toLowerCase() =='img'){
+            topNum = Number(target.alt);
+        }
+        doSelction();
+    }
+    //切换样式选择
+    function doSelction(){
+        for(let item of imageList){
+            if(item.alt==topNum)
+            {
+                item.style.opacity="1";
+            }
+            else{
+                item.style.opacity="0";
+            }
+        }  
+    }
+    function initialize(){
+        for(let i=0; i<totalNum; i++){
+            var temp1 = document.createElement('img');
+            var temp2 = document.createElement('img');
+            temp1.src = temp2.src = basicPath + nameList[i];
+            temp1.alt = temp2.alt = i.toString();
+            carouselMap.appendChild(temp1);
+            thumbImages.appendChild(temp2);  
+            imageList.push(temp1);         
+        };
+        doSelction();
+    }
+
+    requestImages.open('get','http:localhost:2000/getImageList',true);
+    requestImages.onreadystatechange = function(){
+        if(requestImages.readyState==4){
+            if(requestImages.status==200||requestImages.status==0){
+                nameList = JSON.parse(requestImages.responseText)['nameList'];
+                totalNum = nameList.length;
+                initialize();
+                setInterval(()=>{
+                    topNum = (topNum+1)%totalNum;
+                    doSelction();
+                    },3000);
+            }
+        }
+    }
+    requestImages.send(null);
+
+    
+// 编写轮播事件  
+    
+</script>
+</html>
